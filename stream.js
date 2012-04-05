@@ -1,4 +1,8 @@
-var twitter = require('ntwitter');
+var twitter = require('ntwitter'),
+    ejs = require('ejs'),
+    express = require('express'),
+    app = express.createServer(),
+    io = require('socket.io').listen(app);
 
 var twit = new twitter({
     consumer_key: 'L5e2s3jSFyaqn2HiUhQfqA',
@@ -8,7 +12,30 @@ var twit = new twitter({
 });
 
 twit.stream('statuses/sample', function(stream) {
-    stream.on('data', function (data) {
-        if (data.coordinates != null) console.log(data.geo);
+    io.sockets.on('connection', function (socket) {
+        stream.on('data', function (data) {
+            if (data.geo != null) {
+                socket.emit('tweet', data);
+            }
+        });
     });
 });
+
+app.use(express.logger());
+
+app.set('views', __dirname + '/views');
+app.set('view engine', 'html');
+app.use(express.bodyParser());
+app.use(express.methodOverride());
+app.use(app.router);
+app.register('.html', ejs);
+app.register('.js', ejs);
+
+app.get('/', function (req, res) {
+    res.render('map', {
+        layout: false
+    });
+});
+
+app.listen(8080);
+console.log('Express server started on port %s', app.address().port);
