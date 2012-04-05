@@ -46,7 +46,9 @@
                 zoom: 4,
                 center: new google.maps.LatLng(0, 0),
                 disableDefaultUI: true,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                scrollwheel: false,
+                disableDoubleClickZoom: true
             };
 
             var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
@@ -74,19 +76,20 @@
                     maxWidth: 150
                 });
 
-                var oldDraw = infowindow.draw;
-                infowindow.draw = function () {
-                    oldDraw.apply(this);
-                    jQuery(infowindow.div_).hide();
-                    jQuery(infowindow.div_).fadeIn('slow');
-                };
-
                 infowindow.open(map, marker);
 
                 markers.push({marker: marker, info: infowindow});
 
                 if (markers.length > 2) {
                     markers[i].info.close();
+
+                    var x = i;
+
+                    google.maps.event.addListener(markers[x].marker, 'click', function () {
+                        console.log(arguments);
+                        markers[x].info.open(map, markers[x].info.marker);
+                    });
+
                     i++;
                     //markers.shift();
                 }
