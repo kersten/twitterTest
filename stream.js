@@ -11,13 +11,23 @@ var twit = new twitter({
     access_token_secret: 'aEhMmlyObtw9U7WMm0mBzPssAyDMP6LyVP6ID02jE'
 });
 
-twit.stream('statuses/sample', function(stream) {
+twit.stream('statuses/filter', {track: 'piraten'}, function(stream) {
     io.sockets.on('connection', function (socket) {
         stream.on('data', function (data) {
             if (data.geo != null) {
                 socket.emit('tweet', data);
             }
         });
+    });
+
+    stream.on('data', function (data) {
+        console.log(data.text);
+    });
+
+    stream.on('error', function (data) {
+        if (data != null) {
+            console.log(arguments);
+        }
     });
 });
 

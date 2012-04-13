@@ -102,8 +102,12 @@
             var oldPos = [];
 
             socket.on('tweet', function (data) {
-                if (data.retweeted === true) {
+                if (data.retweeted) {
                     console.log(data);
+                }
+
+                if (data.in_reply_to_status_id) {
+                    console.log('Connection', data);
                 }
 
                 var pos = new google.maps.LatLng(data.geo.coordinates[0], data.geo.coordinates[1]);
